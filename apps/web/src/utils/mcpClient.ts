@@ -43,44 +43,101 @@ interface JsonRpcResponse<T> {
   error?: { code: number; message: string; data?: unknown };
 }
 
+let activePostUrl: string | null = null;
+let sseConnectionPromise: Promise<string> | null = null;
+const pendingRequests = new Map<number, { resolve: (val: any) => void; reject: (err: any) => void }>();
+
+async function getMcpPostUrl(): Promise<string> {
+  if (activePostUrl) return activePostUrl;
+  if (sseConnectionPromise) return sseConnectionPromise;
+
+  sseConnectionPromise = new Promise((resolve, reject) => {
+    try {
+      const eventSource = new EventSource(`${MCP_SERVER_URL}/mcp`);
+
+      eventSource.addEventListener('endpoint', (e: any) => {
+        const postUrl = new URL(e.data, MCP_SERVER_URL).toString();
+        activePostUrl = postUrl;
+        resolve(postUrl);
+      });
+
+      eventSource.addEventListener('message', (e: any) => {
+        try {
+          const json = JSON.parse(e.data) as JsonRpcResponse<any>;
+          if (json.id !== undefined && pendingRequests.has(json.id)) {
+            const { resolve, reject } = pendingRequests.get(json.id)!;
+            pendingRequests.delete(json.id);
+            if (json.error) {
+              reject(new Error(json.error.message));
+            } else {
+              let resObj = json.result;
+              if (resObj && typeof resObj === 'object' && 'content' in resObj) {
+                const textObj = resObj.content.find((c: any) => c.type === 'text');
+                if (textObj && textObj.text) {
+                  try {
+                    resObj = JSON.parse(textObj.text);
+                  } catch (e) {
+                    resObj = { answer: textObj.text };
+                  }
+                }
+              }
+              resolve(resObj);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to parse MCP message", err);
+        }
+      });
+
+      eventSource.onerror = () => {
+        reject(new Error("Failed to connect to MCP SSE endpoint"));
+        eventSource.close();
+      };
+    } catch (err) {
+      reject(err);
+    }
+  });
+
+  return sseConnectionPromise;
+}
+
 async function callTool<T = unknown>(
   toolName: string,
   args: Record<string, unknown> = {},
 ): Promise<T> {
+  const postUrl = await getMcpPostUrl();
   const id = _requestId++;
 
-  const response = await fetch(`${MCP_SERVER_URL}/mcp`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id,
-      method: 'tools/call',
-      params: {
-        name: toolName,
-        arguments: args,
-      },
-    }),
+  return new Promise<T>(async (resolve, reject) => {
+    pendingRequests.set(id, { resolve, reject });
+
+    try {
+      const response = await fetch(postUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id,
+          method: 'tools/call',
+          params: {
+            name: toolName,
+            arguments: args,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        pendingRequests.delete(id);
+        reject(new Error(`ContextOS MCP server error: ${response.status} ${response.statusText}`));
+      }
+    } catch (err) {
+      pendingRequests.delete(id);
+      reject(err);
+    }
   });
-
-  if (!response.ok) {
-    throw new Error(
-      `ContextOS MCP server error: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const json: JsonRpcResponse<T> = await response.json();
-
-  if (json.error) {
-    throw new Error(
-      `MCP tool "${toolName}" returned error: ${json.error.message}`,
-    );
-  }
-
-  return json.result as T;
 }
 
 // ---------------------------------------------------------------------------
@@ -153,6 +210,31 @@ export async function mcpGetEnterpriseEntities(
   type?: 'Organization' | 'Repository' | 'SlackWorkspace' | 'Channel' | 'TeamMember',
 ): Promise<{ entities: EnterpriseEntity[]; count: number }> {
   return callTool('get_enterprise_entities', type ? { type } : {});
+}
+
+/**
+ * Call the LLM to query a live GitHub repository.
+ * Calls the standalone REST API on port 3002, bypassing MCP.
+ */
+export async function mcpAskLiveGithubRepo(
+  query: string,
+  repoUrl: string,
+): Promise<{ answer: string }> {
+  const LIVE_API_URL =
+    (import.meta as any).env?.VITE_LIVE_API_URL ?? 'http://localhost:3002';
+
+  const response = await fetch(`${LIVE_API_URL}/api/ask`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, repoUrl }),
+  });
+
+  if (!response.ok) {
+    const errBody = await response.json().catch(() => ({ error: response.statusText }));
+    throw new Error(errBody.error || `Live API error: ${response.status}`);
+  }
+
+  return response.json();
 }
 
 // ---------------------------------------------------------------------------

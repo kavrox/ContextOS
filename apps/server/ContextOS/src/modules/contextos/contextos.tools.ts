@@ -25,6 +25,7 @@ import {
   buildContextGraph,
   getEnterpriseEntities,
 } from '../../agents/index.js';
+import { askLiveGithubRepo } from '../../agents/retriever/retriever.js';
 
 // ---------------------------------------------------------------------------
 // ContextOS Tools class
@@ -300,5 +301,39 @@ export class ContextOSTools {
       entities,
       count: entities.length,
     };
+  }
+
+  // ─── 8. ask_live_github_repo ──────────────────────────────────────────────
+
+  @Tool({
+    name: 'ask_live_github_repo',
+    description:
+      'Download a GitHub repository, bundle its text files, and pass it to an LLM ' +
+      'to answer a natural language question. Used for live Q&A over real repositories.',
+    inputSchema: z.object({
+      query: z.string().min(3).describe('The engineering question'),
+      repoUrl: z.string().url().describe('The full GitHub repository URL'),
+    }),
+    examples: {
+      request: { query: 'What does this repo do?', repoUrl: 'https://github.com/user/repo' },
+      response: { answer: 'This repo is a...' },
+    },
+  })
+  async askLiveGithubRepo(
+    input: { query: string; repoUrl: string },
+    ctx: ExecutionContext,
+  ) {
+    ctx.logger.info('[ContextOS] ask_live_github_repo called', {
+      query: input.query,
+      repoUrl: input.repoUrl,
+    });
+
+    try {
+      const answer = await askLiveGithubRepo(input.query, input.repoUrl);
+      return { answer };
+    } catch (err: any) {
+      ctx.logger.error('[ContextOS] ask_live_github_repo failed', { error: err.message });
+      throw new Error(`Failed to query LLM for repo: ${err.message}`);
+    }
   }
 }

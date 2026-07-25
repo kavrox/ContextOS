@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Sparkles, Send, Brain, Zap, Clock, GitPullRequest } from 'lucide-react';
 import { searchKnowledgeBase } from '../utils/dataStore';
 import type { DemoScenario } from '../utils/dataStore';
+import { mcpAskLiveGithubRepo } from '../utils/mcpClient';
 import CitationCard from './CitationCard';
 
 interface ChatPanelProps {
@@ -11,6 +12,7 @@ interface ChatPanelProps {
 
 export default function ChatPanel({ onScenarioChange, activeScenario }: ChatPanelProps) {
   const [query, setQuery] = useState('');
+  const [githubRepo, setGithubRepo] = useState('');
   const [useCache, setUseCache] = useState(true);
   const [askedQuestions, setAskedQuestions] = useState<Record<string, boolean>>({});
   
@@ -29,10 +31,12 @@ export default function ChatPanel({ onScenarioChange, activeScenario }: ChatPane
   const presetQuestions = [
     { text: "Why are we using Redis?", id: "redis" },
     { text: "What happens if I modify CheckoutService?", id: "checkout" },
-    { text: "Show me how authentication evolved.", id: "auth" }
+    { text: "Show me how authentication evolved.", id: "auth" },
+    { text: "How does modifying the EvidenceItem schema affect Alice's foundation code?", id: "alice" },
+    { text: "What is the company's workflow and core thought process?", id: "workflow" }
   ];
 
-  const handleAsk = (textToAsk: string) => {
+  const handleAsk = async (textToAsk: string) => {
     if (!textToAsk.trim()) return;
     
     // Stop any active stream timers
@@ -41,7 +45,48 @@ export default function ChatPanel({ onScenarioChange, activeScenario }: ChatPane
     }
 
     const normText = textToAsk.trim();
-    // Resolve matching data scenario
+
+    // LIVE LLM MODE
+    if (githubRepo.trim() !== '') {
+      setPipelineState('planning');
+      setStatusMessage(`Cloning and bundling ${githubRepo}...`);
+      setStreamedText('');
+      
+      const liveScenario: DemoScenario = {
+        question: normText,
+        answer: '',
+        citations: [],
+        graph: { nodes: [], edges: [] },
+        task: {
+          id: 'live-llm-task',
+          question: normText,
+          status: 'planning',
+          plan: [],
+          executionTrace: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      };
+      onScenarioChange(liveScenario);
+
+      try {
+        setStatusMessage('Groq Llama 3.3 70B is analyzing the codebase...');
+        const result = await mcpAskLiveGithubRepo(normText, githubRepo.trim());
+        
+        liveScenario.answer = result.answer;
+        liveScenario.task.status = 'completed';
+        onScenarioChange({ ...liveScenario });
+        
+        setPipelineState('done');
+        setStreamedText(result.answer);
+      } catch (err: any) {
+        setPipelineState('done');
+        setStreamedText(`❌ LLM Live Query Failed: ${err.message}\n(Ensure the Live API server is running: npx tsx src/live-api.ts)`);
+      }
+      return;
+    }
+
+    // MOCK MODE
     const resolved = searchKnowledgeBase(normText);
     
     // Check if it's a fast-path cache hit
@@ -301,8 +346,16 @@ export default function ChatPanel({ onScenarioChange, activeScenario }: ChatPane
             e.preventDefault();
             handleAsk(query);
           }}
-          className="p-4 border-t border-border bg-background/50 flex gap-3"
+          className="p-4 border-t border-border bg-background/50 flex flex-col gap-3"
         >
+          <input
+            type="text"
+            value={githubRepo}
+            onChange={(e) => setGithubRepo(e.target.value)}
+            placeholder="Live LLM Mode: Paste a GitHub Repo URL (e.g. https://github.com/facebook/react) to query it live!"
+            className="w-full bg-accent-indigo/5 border border-accent-indigo/30 focus:border-accent-indigo/60 px-4 py-2 rounded-lg text-[11px] text-accent-indigo placeholder-accent-indigo/50 focus:outline-none transition-colors duration-150 font-mono"
+          />
+          <div className="flex gap-3">
           <input
             type="text"
             value={query}
@@ -316,6 +369,7 @@ export default function ChatPanel({ onScenarioChange, activeScenario }: ChatPane
           >
             <Send className="w-4 h-4" />
           </button>
+          </div>
         </form>
 
       </div>

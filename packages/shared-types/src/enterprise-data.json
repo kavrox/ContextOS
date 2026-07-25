@@ -367,6 +367,60 @@
       "timestamp": "2026-07-25T16:10:00Z",
       "sourceHash": "sha256-y9t8r7e6w5q4a3",
       "tags": ["rollback", "incident", "deployment", "demo-fallback"]
+    },
+    {
+      "id": "mem:alice-schema-impact",
+      "question": "How does modifying the EvidenceItem schema affect Alice's foundation code?",
+      "answer": "Modifying the `EvidenceItem` schema in `packages/shared-types/src/index.ts` has a cascading effect across the entire monorepo. Since Alice (Developer A) owns the Foundation track, any changes she makes to the Zod schemas instantly require updates in Bob's Retriever logic and Charlie's MCP server. In PR [gh-pr-155](https://github.com/contextos/contextos-core/pull/155), Alice added the `relevanceScore` field. According to Slack thread [slack-msg-707](https://contextos-hq.slack.com/archives/C0123456/p1717082020000), Bob had to immediately pull her branch to update the Context Builder's budget enforcement logic before Demo 1.",
+      "citations": [
+        {
+          "sourceId": "gh-pr-155",
+          "type": "pr",
+          "excerpt": "Feat: Add relevanceScore number field to EvidenceItem Zod schema for token budgeting.",
+          "url": "https://github.com/contextos/contextos-core/pull/155",
+          "timestamp": "2026-07-24T10:00:00Z",
+          "relevanceScore": 0.95
+        },
+        {
+          "sourceId": "slack-msg-707",
+          "type": "slack_thread",
+          "excerpt": "Alice: I just merged the relevanceScore field to shared-types.\nBob: Pulling now. I need this to sort the Retriever's top-8 budget.",
+          "url": "https://contextos-hq.slack.com/archives/C0123456/p1717082020000",
+          "timestamp": "2026-07-24T10:15:00Z",
+          "relevanceScore": 0.89
+        }
+      ],
+      "embeddings": [0.22, 0.55, -0.11, 0.33, 0.77],
+      "timestamp": "2026-07-25T16:20:00Z",
+      "sourceHash": "sha256-a1b2c3d4e5f6g7",
+      "tags": ["schema", "foundation", "alice", "impact", "zod"]
+    },
+    {
+      "id": "mem:company-workflow",
+      "question": "What is the company's workflow and core thought process?",
+      "answer": "The core workflow of ContextOS is defined by our 'Vibe-Coding' strategy and strict track isolation, as documented in [doc-workflow](https://github.com/contextos/contextos-core/blob/main/docs/ProjectBible/01-workflow.md). Our thought process prioritizes zero-conflict velocity during the 24-hour hackathon. We use a 'Push-Pull Rhythm': the Foundation track (Zod schemas) merges first, acting as the Single Source of Truth. The Brain (Agent Logic), Plumber (MCP Server), and Web Wizard (React UI) tracks run in parallel and pull upstream schema changes immediately. In [slack-msg-808](https://contextos-hq.slack.com/archives/C0111111/p1717182020000), the team agreed that mutating files outside assigned tracks is strictly forbidden to prevent Git merge nightmares.",
+      "citations": [
+        {
+          "sourceId": "doc-workflow",
+          "type": "doc",
+          "excerpt": "Core Strategy: Vibe-Coding. Tracks MUST remain isolated. Foundation merges first, dependent tracks pull immediately. No cross-track file mutations.",
+          "url": "https://github.com/contextos/contextos-core/blob/main/docs/ProjectBible/01-workflow.md",
+          "timestamp": "2026-07-25T08:00:00Z",
+          "relevanceScore": 0.99
+        },
+        {
+          "sourceId": "slack-msg-808",
+          "type": "slack_thread",
+          "excerpt": "Diana: Can I update the Retriever for the UI?\nBob: No! That breaks isolation protocol. Ask me to expose the data in the MCP server instead.",
+          "url": "https://contextos-hq.slack.com/archives/C0111111/p1717182020000",
+          "timestamp": "2026-07-25T09:30:00Z",
+          "relevanceScore": 0.92
+        }
+      ],
+      "embeddings": [-0.34, 0.12, 0.88, -0.56, 0.22],
+      "timestamp": "2026-07-25T16:30:00Z",
+      "sourceHash": "sha256-h8g7f6e5d4c3b2",
+      "tags": ["workflow", "thought-process", "isolation", "vibe-coding"]
     }
   ]
 }

@@ -51,6 +51,7 @@ function resolveDataPath(): string {
       '..',
       '..',
       '..',
+      '..',
       'packages',
       'shared-types',
       'src',
@@ -60,6 +61,7 @@ function resolveDataPath(): string {
     // Fallback for environments where import.meta.url is unavailable
     return resolve(
       process.cwd(),
+      '..',
       '..',
       '..',
       'packages',

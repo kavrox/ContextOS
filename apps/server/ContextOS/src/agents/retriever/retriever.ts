@@ -10,6 +10,8 @@
 import type { MemoryEntry, EvidenceItem } from '@contextos/shared-types';
 import { getAllMemories } from '../memory/memory-manager.js';
 import { computeRelevance } from './relevance.js';
+import { askCodebase } from '../llm/client.js';
+import { fetchAndBundleRepo } from '../github/fetcher.js';
 
 // ---------------------------------------------------------------------------
 // Constants — per team decision (mem:retriever-token-limits)
@@ -129,4 +131,17 @@ export async function retrieveEvidence(
   // Enforce the same budget on evidence items
   const maxResults = options.maxResults ?? DEFAULT_MAX_RESULTS;
   return evidence.slice(0, maxResults);
+}
+
+/**
+ * Live GitHub Repository QA using Gemini LLM
+ */
+export async function askLiveGithubRepo(query: string, repoUrl: string): Promise<string> {
+  console.log(`[Live QA] Fetching repository: ${repoUrl}`);
+  const codebaseContext = await fetchAndBundleRepo(repoUrl);
+  
+  console.log(`[Live QA] Sending ${codebaseContext.length} chars of context to LLM...`);
+  const answer = await askCodebase(query, codebaseContext);
+  
+  return answer;
 }

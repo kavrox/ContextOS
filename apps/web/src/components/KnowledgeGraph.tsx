@@ -166,10 +166,15 @@ export default function KnowledgeGraph({ graphData }: KnowledgeGraphProps) {
     setNodes((currentNodes) => {
       const copy = [...currentNodes];
       const nodeIdx = dragNodeRef.current!;
-      copy[nodeIdx].x = x;
-      copy[nodeIdx].y = y;
-      copy[nodeIdx].vx = 0;
-      copy[nodeIdx].vy = 0;
+      if (nodeIdx >= 0 && nodeIdx < copy.length) {
+        copy[nodeIdx] = {
+          ...copy[nodeIdx],
+          x,
+          y,
+          vx: 0,
+          vy: 0
+        };
+      }
       return copy;
     });
   };
