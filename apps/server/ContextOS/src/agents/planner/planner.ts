@@ -15,7 +15,7 @@ import {
   AgentTaskSchema,
   type AgentTask,
   type ToolCall,
-} from '@contextos/shared-types';
+} from '../../shared-types/index.js';
 import { retrieveMemories, retrieveEvidence } from '../retriever/retriever.js';
 import { buildContextGraph } from '../context/context-builder.js';
 

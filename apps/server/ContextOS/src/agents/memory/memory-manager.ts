@@ -12,7 +12,7 @@ import { z } from 'zod';
 import {
   MemoryEntrySchema,
   type MemoryEntry,
-} from '@contextos/shared-types';
+} from '../../shared-types/index.js';
 import { getMemoryEntries as loadFromDisk } from '../data/data-loader.js';
 
 // ---------------------------------------------------------------------------

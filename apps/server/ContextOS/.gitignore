@@ -56,3 +56,6 @@ uploads/
 *.key
 tokens.json
 .nitrostudio/
+
+# Added by nitrostack pack
+.git/

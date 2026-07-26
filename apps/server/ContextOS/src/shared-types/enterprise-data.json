@@ -1,0 +1,426 @@
+{
+  "enterpriseEntities": [
+    {
+      "id": "org:contextos",
+      "type": "Organization",
+      "name": "ContextOS Open Source Initiative",
+      "externalId": "github-org-772910",
+      "metadata": {
+        "url": "https://github.com/contextos",
+        "description": "Building the permanent queryable memory layer for engineering teams.",
+        "isActive": true,
+        "createdAt": "2026-01-15T09:00:00Z"
+      }
+    },
+    {
+      "id": "repo:contextos-core",
+      "type": "Repository",
+      "name": "contextos-core",
+      "externalId": "github-repo-8820102",
+      "metadata": {
+        "url": "https://github.com/contextos/contextos-core",
+        "description": "Core monorepo containing NitroStack server and React web dashboards.",
+        "isActive": true,
+        "createdAt": "2026-02-01T10:30:00Z"
+      }
+    },
+    {
+      "id": "slack-workspace:contextos-hq",
+      "type": "SlackWorkspace",
+      "name": "ContextOS HQ Slack",
+      "externalId": "slack-team-T012345",
+      "metadata": {
+        "url": "https://contextos-hq.slack.com",
+        "description": "Internal communication workspace for ContextOS team.",
+        "isActive": true,
+        "createdAt": "2026-01-20T14:00:00Z"
+      }
+    },
+    {
+      "id": "slack-channel:engineering",
+      "type": "Channel",
+      "name": "engineering",
+      "externalId": "slack-channel-C0123456",
+      "metadata": {
+        "url": "https://contextos-hq.slack.com/archives/C0123456",
+        "description": "Technical discussions, architecture updates, and PR links.",
+        "isActive": true,
+        "createdAt": "2026-01-20T14:15:00Z"
+      }
+    },
+    {
+      "id": "slack-channel:incident-alerts",
+      "type": "Channel",
+      "name": "incident-alerts",
+      "externalId": "slack-channel-C0777777",
+      "metadata": {
+        "url": "https://contextos-hq.slack.com/archives/C0777777",
+        "description": "Automated deployment logs and emergency rollback triggers.",
+        "isActive": true,
+        "createdAt": "2026-02-10T11:00:00Z"
+      }
+    },
+    {
+      "id": "slack-channel:general",
+      "type": "Channel",
+      "name": "general",
+      "externalId": "slack-channel-C0111111",
+      "metadata": {
+        "url": "https://contextos-hq.slack.com/archives/C0111111",
+        "description": "General banter, team updates, and hackathon schedules.",
+        "isActive": true,
+        "createdAt": "2026-01-20T14:05:00Z"
+      }
+    },
+    {
+      "id": "person:alice",
+      "type": "TeamMember",
+      "name": "Alice Chen",
+      "externalId": "github-user-111111",
+      "metadata": {
+        "url": "https://github.com/alice-chen",
+        "description": "Developer A - Shared Schema & Foundation Lead.",
+        "email": "alice@contextos.org",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/111111?v=4",
+        "isActive": true,
+        "createdAt": "2026-01-16T10:00:00Z"
+      }
+    },
+    {
+      "id": "person:bob",
+      "type": "TeamMember",
+      "name": "Bob Jenkins",
+      "externalId": "github-user-222222",
+      "metadata": {
+        "url": "https://github.com/bob-jenkins",
+        "description": "Developer B - Core Agentic Planner & Retriever Lead.",
+        "email": "bob@contextos.org",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/222222?v=4",
+        "isActive": true,
+        "createdAt": "2026-01-16T10:05:00Z"
+      }
+    },
+    {
+      "id": "person:charlie",
+      "type": "TeamMember",
+      "name": "Charlie Davis",
+      "externalId": "github-user-333333",
+      "metadata": {
+        "url": "https://github.com/charlie-davis",
+        "description": "Developer C - MCP Server & Tool Integration Specialist.",
+        "email": "charlie@contextos.org",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/333333?v=4",
+        "isActive": true,
+        "createdAt": "2026-01-16T10:10:00Z"
+      }
+    },
+    {
+      "id": "person:diana",
+      "type": "TeamMember",
+      "name": "Diana Ross",
+      "externalId": "github-user-444444",
+      "metadata": {
+        "url": "https://github.com/diana-ross",
+        "description": "Developer D - Web Wizard & Visual Experience Designer.",
+        "email": "diana@contextos.org",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/444444?v=4",
+        "isActive": true,
+        "createdAt": "2026-01-16T10:15:00Z"
+      }
+    }
+  ],
+  "memoryEntries": [
+    {
+      "id": "mem:why-redis",
+      "question": "Why are we using Redis?",
+      "answer": "We adopted Redis to act as our primary cluster-wide session cache. Originally, the system relied on local in-memory stores (`Map`), which caused session fragmentation when scaling the MCP server behind a load balancer. PR [gh-pr-48](https://github.com/contextos/contextos-core/pull/48) replaced the local memory manager with `RedisSessionStore`. According to Slack thread [slack-msg-101](https://contextos-hq.slack.com/archives/C0123456/p1716382020000), using Redis also unlocks publish/subscribe capabilities which are crucial for pushing real-time ContextNode graphs to multiple connected web dashboards.",
+      "citations": [
+        {
+          "sourceId": "gh-pr-48",
+          "type": "pr",
+          "excerpt": "commit b3b8602: Replace InMemorySessionStore with RedisSessionStore utilizing ioredis client.\ncommit e772ba1: Inject Redis config variables, setup reconnect options.",
+          "url": "https://github.com/contextos/contextos-core/pull/48",
+          "timestamp": "2026-06-15T18:22:00Z",
+          "relevanceScore": 0.95
+        },
+        {
+          "sourceId": "slack-msg-101",
+          "type": "slack_thread",
+          "excerpt": "Bob: We need to scale the server. Storing session state in Node memory is causing multi-instance auth misses.\nAlice: Let's spin up a Redis container. We can also use it for live pub/sub on the graph updates later.",
+          "url": "https://contextos-hq.slack.com/archives/C0123456/p1716382020000",
+          "timestamp": "2026-06-14T10:15:00Z",
+          "relevanceScore": 0.88
+        }
+      ],
+      "embeddings": [0.12, -0.45, 0.78, 0.03, -0.21],
+      "timestamp": "2026-07-25T14:00:00Z",
+      "sourceHash": "sha256-a9f8e7d6c5b4a3",
+      "tags": ["redis", "session", "architecture", "caching"]
+    },
+    {
+      "id": "mem:auth-evolution",
+      "question": "How did authentication evolve?",
+      "answer": "ContextOS authentication evolved in three stages:\n1. **Static API Keys:** Added in [gh-pr-12](https://github.com/contextos/contextos-core/pull/12) for simple header-based authentication (`X-ContextOS-Key`).\n2. **OAuth 2.1 Debate:** In Slack thread [slack-msg-202](https://contextos-hq.slack.com/archives/C0123456/p1716482020000), the team highlighted that standard API keys were insufficient for enterprise MCP client configurations. Diana recommended moving to dynamic authentication token exchanges.\n3. **NitroStack Guarded OAuth Integration:** Finally, in [gh-pr-89](https://github.com/contextos/contextos-core/pull/89), Charlie integrated NitroStack's `@UseGuards` with custom OAuth 2.1 authorization servers, enabling role-based client tokens.",
+      "citations": [
+        {
+          "sourceId": "gh-pr-12",
+          "type": "pr",
+          "excerpt": "Adding SimpleApiKeyGuard to authenticate developer shell commands.",
+          "url": "https://github.com/contextos/contextos-core/pull/12",
+          "timestamp": "2026-02-15T09:00:00Z",
+          "relevanceScore": 0.75
+        },
+        {
+          "sourceId": "slack-msg-202",
+          "type": "slack_thread",
+          "excerpt": "Diana: We can't distribute raw API keys to external MCP applications. It violates client-side security policies.\nCharlie: Agrees. Let's build OAuth token endpoints.",
+          "url": "https://contextos-hq.slack.com/archives/C0123456/p1716482020000",
+          "timestamp": "2026-03-01T15:20:00Z",
+          "relevanceScore": 0.9
+        },
+        {
+          "sourceId": "gh-pr-89",
+          "type": "pr",
+          "excerpt": "Feat: Implement OAuth2.1 flow via NitroStack Guards, generating short-lived JWT credentials.",
+          "url": "https://github.com/contextos/contextos-core/pull/89",
+          "timestamp": "2026-04-10T17:35:00Z",
+          "relevanceScore": 0.98
+        }
+      ],
+      "embeddings": [0.33, -0.05, 0.44, 0.91, -0.12],
+      "timestamp": "2026-07-25T14:30:00Z",
+      "sourceHash": "sha256-b8c7d6e5f4a3b2",
+      "tags": ["authentication", "oauth", "security", "evolution"]
+    },
+    {
+      "id": "mem:checkout-service-dependencies",
+      "question": "What happens if I modify CheckoutService?",
+      "answer": "Modifying `CheckoutService` in `src/services/checkout.ts` has a high blast radius:\n1. **Direct Dependents:** The service is imported by `PaymentGateway` and `OrderController`. Changes to `CheckoutService` parameters require synchronous updates in both dependents (verified via code check [gh-file-checkout](https://github.com/contextos/contextos-core/blob/main/src/services/checkout.ts)).\n2. **Historical Context:** PR [gh-pr-112](https://github.com/contextos/contextos-core/pull/112) refactored the checkout flow to implement asynchronous invoice creation, which uses an events pipeline. Broken parameters in `CheckoutService` will block the events workers without failing compiles.",
+      "citations": [
+        {
+          "sourceId": "gh-file-checkout",
+          "type": "file",
+          "excerpt": "class CheckoutService {\n  async processCart(cartId: string, options: CheckoutOptions): Promise<Order> {\n    // depends on InventoryService and PaymentGateway\n  }",
+          "url": "https://github.com/contextos/contextos-core/blob/main/src/services/checkout.ts",
+          "timestamp": "2026-07-20T12:00:00Z",
+          "relevanceScore": 0.92
+        },
+        {
+          "sourceId": "gh-pr-112",
+          "type": "pr",
+          "excerpt": "Refactor checkout flow to emit order.created events instead of blocking synchronously for invoicing.",
+          "url": "https://github.com/contextos/contextos-core/pull/112",
+          "timestamp": "2026-05-18T14:10:00Z",
+          "relevanceScore": 0.85
+        }
+      ],
+      "embeddings": [-0.22, 0.67, 0.11, -0.45, 0.82],
+      "timestamp": "2026-07-25T15:00:00Z",
+      "sourceHash": "sha256-z1y2x3w4v5u6t7",
+      "tags": ["checkout", "dependencies", "impact-analysis", "risk"]
+    },
+    {
+      "id": "mem:sqlite-vs-pgvector",
+      "question": "Why did we choose SQLite for the hackathon MVP database instead of pgvector?",
+      "answer": "We chose local SQLite because it provides zero-setup, zero-dependency storage. While pgvector is our recommended production route (see docs/ProjectBible/10-startup-vision.md), setting it up during a 24-hour hackathon introduces deployment risks. Bob argued in [slack-msg-303](https://contextos-hq.slack.com/archives/C0123456/p1716582020000) that performing in-memory cosine similarity is fast enough for ~500 nodes. PR [gh-pr-32](https://github.com/contextos/contextos-core/pull/32) initialized the local SQLite db schema.",
+      "citations": [
+        {
+          "sourceId": "slack-msg-303",
+          "type": "slack_thread",
+          "excerpt": "Bob: Setting up pgvector will take 2 hours of docker configurations that might break on other dev boxes.\nAlice: Fully agree. SQLite locally is a single file. Let's do simple in-memory vector math.",
+          "url": "https://contextos-hq.slack.com/archives/C0123456/p1716582020000",
+          "timestamp": "2026-06-01T11:45:00Z",
+          "relevanceScore": 0.94
+        },
+        {
+          "sourceId": "gh-pr-32",
+          "type": "pr",
+          "excerpt": "Init: Create schema for sqlite memory cache, linking context_nodes and context_edges tables.",
+          "url": "https://github.com/contextos/contextos-core/pull/32",
+          "timestamp": "2026-06-02T16:30:00Z",
+          "relevanceScore": 0.8
+        }
+      ],
+      "embeddings": [0.05, -0.88, 0.12, 0.45, -0.66],
+      "timestamp": "2026-07-25T15:10:00Z",
+      "sourceHash": "sha256-k9j8h7g6f5d4s3",
+      "tags": ["sqlite", "pgvector", "database", "hackathon"]
+    },
+    {
+      "id": "mem:project-timeline",
+      "question": "What is the team layout and timeline for the ContextOS project?",
+      "answer": "ContextOS is built by four developers in a 24-hour timeline. As described in the timeline documentation [doc-timeline](https://github.com/contextos/contextos-core/blob/main/docs/ProjectBible/07-team-and-timeline.md):\n- **Alice (Dev 1):** Planner, Reflection, & NitroStack Setup.\n- **Bob (Dev 2):** Context Builder, Memory Manager, & Shared Zod Schemas.\n- **Charlie (Dev 3):** MCP Clients (GitHub/Slack/Filesystem) & Graph sync.\n- **Diana (Dev 4):** React, Tailwind, and visual dashboards.\n\nThe project is separated into distinct phases, aiming for full pipeline integration by Hour 12.",
+      "citations": [
+        {
+          "sourceId": "doc-timeline",
+          "type": "doc",
+          "excerpt": "Dev 1: Planner/Reflection\nDev 2: Context Builder/Memory/Schemas\nDev 3: MCP Clients/Graph Sync\nDev 4: React UI dashboard\nMilestone: Merge point at Hour 12 for Demo 1.",
+          "url": "https://github.com/contextos/contextos-core/blob/main/docs/ProjectBible/07-team-and-timeline.md",
+          "timestamp": "2026-07-25T12:00:00Z",
+          "relevanceScore": 0.99
+        }
+      ],
+      "embeddings": [-0.11, 0.22, 0.88, -0.04, 0.55],
+      "timestamp": "2026-07-25T15:20:00Z",
+      "sourceHash": "sha256-q1w2e3r4t5y6u7",
+      "tags": ["timeline", "team", "organization", "schedule"]
+    },
+    {
+      "id": "mem:retriever-token-limits",
+      "question": "How is the token limit managed in the Retriever?",
+      "answer": "ContextOS follows the 'retrieve narrow, reason deep' strategy. In [slack-msg-404](https://contextos-hq.slack.com/archives/C0123456/p1716682020000), Bob suggested adding a hard budget limit in the Retriever. PR [gh-pr-150](https://github.com/contextos/contextos-core/pull/150) implemented a top-8 item budget based on relevance scores, preventing token overflow when retrieving large Slack threads or codebase summaries.",
+      "citations": [
+        {
+          "sourceId": "slack-msg-404",
+          "type": "slack_thread",
+          "excerpt": "Bob: If we fetch full slack histories, we'll blow our context limits and prompt caching won't hit.\nAlice: Let's put a hard limit of 8 evidence items, sorted by score, in the context assembler.",
+          "url": "https://contextos-hq.slack.com/archives/C0123456/p1716682020000",
+          "timestamp": "2026-07-05T09:12:00Z",
+          "relevanceScore": 0.93
+        },
+        {
+          "sourceId": "gh-pr-150",
+          "type": "pr",
+          "excerpt": "Feat: Limit Context Builder package to select maximum 8 EvidenceItems based on relevanceScore descending.",
+          "url": "https://github.com/contextos/contextos-core/pull/150",
+          "timestamp": "2026-07-06T11:40:00Z",
+          "relevanceScore": 0.96
+        }
+      ],
+      "embeddings": [0.45, 0.12, -0.34, -0.76, 0.08],
+      "timestamp": "2026-07-25T15:30:00Z",
+      "sourceHash": "sha256-t5y6u7i8o9p0a1",
+      "tags": ["retriever", "token-limits", "performance", "claude"]
+    },
+    {
+      "id": "mem:why-nitrostack",
+      "question": "Why is NitroStack used as the backend framework?",
+      "answer": "NitroStack was selected because it matches our decorator-based, declarative MCP requirements perfectly. During evaluation in [slack-msg-505](https://contextos-hq.slack.com/archives/C0123456/p1716782020000), Alice and Charlie agreed that NitroStack's out-of-the-box `@Tool` schema codegen and native visual client (NitroStudio) dramatically decrease our debug cycles.",
+      "citations": [
+        {
+          "sourceId": "slack-msg-505",
+          "type": "slack_thread",
+          "excerpt": "Alice: Express will require us to write custom JSON-RPC routers. NitroStack does it with a simple @McpApp decorator.\nCharlie: The NitroStudio desktop UI is a huge plus. We can test tools without loading the frontend.",
+          "url": "https://contextos-hq.slack.com/archives/C0123456/p1716782020000",
+          "timestamp": "2026-05-02T13:40:00Z",
+          "relevanceScore": 0.89
+        }
+      ],
+      "embeddings": [0.11, 0.44, 0.02, 0.67, -0.33],
+      "timestamp": "2026-07-25T15:40:00Z",
+      "sourceHash": "sha256-o0i9u8y7t6r5e4",
+      "tags": ["nitrostack", "mcp", "architecture", "decisions"]
+    },
+    {
+      "id": "mem:contextnode-sync",
+      "question": "How does the ContextNode observability sync work?",
+      "answer": "ContextNode executes sync on-demand. When a question is received, the Scope Resolver parses entity names (like `CheckoutService`) and triggers tool calls to GitHub and Slack for that scope only. PR [gh-pr-75](https://github.com/contextos/contextos-core/pull/75) implemented this on-demand graph builder, storing relational nodes and edges into our cache database.",
+      "citations": [
+        {
+          "sourceId": "gh-pr-75",
+          "type": "pr",
+          "excerpt": "Feat: Add ContextNode ScopeResolver parsing code inputs for file/class paths and sync subgraphs.",
+          "url": "https://github.com/contextos/contextos-core/pull/75",
+          "timestamp": "2026-03-22T10:15:00Z",
+          "relevanceScore": 0.97
+        }
+      ],
+      "embeddings": [-0.55, 0.41, 0.23, -0.12, 0.77],
+      "timestamp": "2026-07-25T15:50:00Z",
+      "sourceHash": "sha256-a1s2d3f4g5h6j7",
+      "tags": ["contextnode", "observability", "sync", "graph"]
+    },
+    {
+      "id": "mem:reflection-agent-structure",
+      "question": "How is the reflection agent structured?",
+      "answer": "The Reflection Agent verifies that every claim in the Reasoning Agent's draft answers maps strictly to a citation. In [gh-pr-62](https://github.com/contextos/contextos-core/pull/62), Alice implemented the parser validator. If a claim lacks grounding, it signals the Planner with a re-plan payload. To avoid loop delays, retries are capped at a maximum of 1.",
+      "citations": [
+        {
+          "sourceId": "gh-pr-62",
+          "type": "pr",
+          "excerpt": "Feat: Add ReflectionAgent self-correction module validating citation references and limit retries to 1.",
+          "url": "https://github.com/contextos/contextos-core/pull/62",
+          "timestamp": "2026-03-11T14:40:00Z",
+          "relevanceScore": 0.94
+        }
+      ],
+      "embeddings": [0.18, -0.23, 0.65, -0.09, 0.21],
+      "timestamp": "2026-07-25T16:00:00Z",
+      "sourceHash": "sha256-z1x2c3v4b5n6m7",
+      "tags": ["reflection-agent", "reliability", "claude", "guardrails"]
+    },
+    {
+      "id": "mem:rollback-procedure",
+      "question": "What is the rollback procedure if a deployed MCP server fails?",
+      "answer": "If a deployed MCP server fails or experiences rate limits, we execute an immediate version rollback. Slack thread [slack-msg-606](https://contextos-hq.slack.com/archives/C0777777/p1716982020000) documents Diana's quick response guidelines: first, disable live network integrations in the env file by setting `MCP_CACHE_FALLBACK=true`, which forces the server to serve all queries using `evidence_cache` SQLite rows. Second, trigger the previous stable build deployment on NitroCloud.",
+      "citations": [
+        {
+          "sourceId": "slack-msg-606",
+          "type": "slack_thread",
+          "excerpt": "Diana: If rate limits hit during the demo, change MCP_CACHE_FALLBACK to true in .env and restart. It will serve cached results instantly.\nCharlie: Roger that, verified the cached answers are preloaded.",
+          "url": "https://contextos-hq.slack.com/archives/C0777777/p1716982020000",
+          "timestamp": "2026-07-20T17:00:00Z",
+          "relevanceScore": 0.91
+        }
+      ],
+      "embeddings": [0.01, -0.32, -0.15, 0.88, -0.42],
+      "timestamp": "2026-07-25T16:10:00Z",
+      "sourceHash": "sha256-y9t8r7e6w5q4a3",
+      "tags": ["rollback", "incident", "deployment", "demo-fallback"]
+    },
+    {
+      "id": "mem:alice-schema-impact",
+      "question": "How does modifying the EvidenceItem schema affect Alice's foundation code?",
+      "answer": "Modifying the `EvidenceItem` schema in `packages/shared-types/src/index.ts` has a cascading effect across the entire monorepo. Since Alice (Developer A) owns the Foundation track, any changes she makes to the Zod schemas instantly require updates in Bob's Retriever logic and Charlie's MCP server. In PR [gh-pr-155](https://github.com/contextos/contextos-core/pull/155), Alice added the `relevanceScore` field. According to Slack thread [slack-msg-707](https://contextos-hq.slack.com/archives/C0123456/p1717082020000), Bob had to immediately pull her branch to update the Context Builder's budget enforcement logic before Demo 1.",
+      "citations": [
+        {
+          "sourceId": "gh-pr-155",
+          "type": "pr",
+          "excerpt": "Feat: Add relevanceScore number field to EvidenceItem Zod schema for token budgeting.",
+          "url": "https://github.com/contextos/contextos-core/pull/155",
+          "timestamp": "2026-07-24T10:00:00Z",
+          "relevanceScore": 0.95
+        },
+        {
+          "sourceId": "slack-msg-707",
+          "type": "slack_thread",
+          "excerpt": "Alice: I just merged the relevanceScore field to shared-types.\nBob: Pulling now. I need this to sort the Retriever's top-8 budget.",
+          "url": "https://contextos-hq.slack.com/archives/C0123456/p1717082020000",
+          "timestamp": "2026-07-24T10:15:00Z",
+          "relevanceScore": 0.89
+        }
+      ],
+      "embeddings": [0.22, 0.55, -0.11, 0.33, 0.77],
+      "timestamp": "2026-07-25T16:20:00Z",
+      "sourceHash": "sha256-a1b2c3d4e5f6g7",
+      "tags": ["schema", "foundation", "alice", "impact", "zod"]
+    },
+    {
+      "id": "mem:company-workflow",
+      "question": "What is the company's workflow and core thought process?",
+      "answer": "The core workflow of ContextOS is defined by our 'Vibe-Coding' strategy and strict track isolation, as documented in [doc-workflow](https://github.com/contextos/contextos-core/blob/main/docs/ProjectBible/01-workflow.md). Our thought process prioritizes zero-conflict velocity during the 24-hour hackathon. We use a 'Push-Pull Rhythm': the Foundation track (Zod schemas) merges first, acting as the Single Source of Truth. The Brain (Agent Logic), Plumber (MCP Server), and Web Wizard (React UI) tracks run in parallel and pull upstream schema changes immediately. In [slack-msg-808](https://contextos-hq.slack.com/archives/C0111111/p1717182020000), the team agreed that mutating files outside assigned tracks is strictly forbidden to prevent Git merge nightmares.",
+      "citations": [
+        {
+          "sourceId": "doc-workflow",
+          "type": "doc",
+          "excerpt": "Core Strategy: Vibe-Coding. Tracks MUST remain isolated. Foundation merges first, dependent tracks pull immediately. No cross-track file mutations.",
+          "url": "https://github.com/contextos/contextos-core/blob/main/docs/ProjectBible/01-workflow.md",
+          "timestamp": "2026-07-25T08:00:00Z",
+          "relevanceScore": 0.99
+        },
+        {
+          "sourceId": "slack-msg-808",
+          "type": "slack_thread",
+          "excerpt": "Diana: Can I update the Retriever for the UI?\nBob: No! That breaks isolation protocol. Ask me to expose the data in the MCP server instead.",
+          "url": "https://contextos-hq.slack.com/archives/C0111111/p1717182020000",
+          "timestamp": "2026-07-25T09:30:00Z",
+          "relevanceScore": 0.92
+        }
+      ],
+      "embeddings": [-0.34, 0.12, 0.88, -0.56, 0.22],
+      "timestamp": "2026-07-25T16:30:00Z",
+      "sourceHash": "sha256-h8g7f6e5d4c3b2",
+      "tags": ["workflow", "thought-process", "isolation", "vibe-coding"]
+    }
+  ]
+}

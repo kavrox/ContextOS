@@ -18,7 +18,7 @@ import {
   EnterpriseEntitySchema,
   type MemoryEntry,
   type EnterpriseEntity,
-} from '@contextos/shared-types';
+} from '../../shared-types/index.js';
 
 // ---------------------------------------------------------------------------
 // Internal cache

@@ -16,7 +16,7 @@ import {
   type ContextEdge,
   type EvidenceItem,
   type MemoryEntry,
-} from '@contextos/shared-types';
+} from '../../shared-types/index.js';
 import { retrieveMemories, type ScoredMemory } from '../retriever/retriever.js';
 import { getEnterpriseEntities } from '../data/data-loader.js';
 

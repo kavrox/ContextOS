@@ -7,7 +7,7 @@
  * the hard evidence budget (default: 8 items).
  */
 
-import type { MemoryEntry, EvidenceItem } from '@contextos/shared-types';
+import type { MemoryEntry, EvidenceItem } from '../../shared-types/index.js';
 import { getAllMemories } from '../memory/memory-manager.js';
 import { computeRelevance } from './relevance.js';
 import { askCodebase } from '../llm/client.js';
